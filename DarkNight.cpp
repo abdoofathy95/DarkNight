@@ -1,21 +1,12 @@
-#include "Camera.h"
-#ifdef __APPLE__
-#  include <OpenGL/gl.h>
-#  include <OpenGL/glu.h>
-#  include <GLUT/glut.h>
-#else
-#  include <GL/gl.h>
-#  include <GL/glu.h>
-#  include <GL/glut.h>
-#endif
+#include <Camera.h>
+#include <glut.h>
 
 // FUNCTIONS DEFENITIONS
-void drawAxis();
-void drawGrid(int x, int y);
+void drawDot(float x,float y,float z);
 void keyboard(unsigned char key, int x, int y);
 void mouse(int x, int y);
 void fpsTimer(int value); // FPS (CONTROL THE RATE POST DISPLAY IS CALLED ( CURRENTLY 60)
-
+void drawHUD();
 						  
 ////////////////////////GAMEPLAY CONSTANTS////////////////////////////////////
 float mouseSensitivity = 1.1;
@@ -25,7 +16,7 @@ const float WINDOW_WIDTH = 1366, WINDOW_HEIGHT = 768; //
 const float FPS = 60.0;
 float oldMouseX = WINDOW_WIDTH/2, oldMouseY = WINDOW_HEIGHT/2;
 
-Camera camera = Camera(0.5, 0, 0.5, 1, 1, 1);
+Camera camera = Camera(0.5, 0, 0.5, 0.4, 0, 0.4);
 
 void drawWall(double thickness) {
 	glPushMatrix();
@@ -54,7 +45,7 @@ void setupLights() {
 void setupCamera() {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45.0, WINDOW_WIDTH / WINDOW_HEIGHT, 0.001, 100);
+	gluPerspective(45.0, WINDOW_WIDTH / WINDOW_HEIGHT, 0.001, 50);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -67,6 +58,7 @@ void Display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glColor3f(0.752941, 0.752941, 0.752941);
 	drawWall(100);
+	drawHUD();
 	glFlush();
 }
 
@@ -74,16 +66,16 @@ void Keyboard(unsigned char key, int x, int y) {
 
 	switch (key) {
 	case 'w':
-		camera.moveZ(characterSpeed);
+		camera.moveForward(characterSpeed);
 		break;
 	case 's':
-		camera.moveZ(-characterSpeed);
+		camera.moveBackward(characterSpeed);
 		break;
 	case 'a':
-		camera.moveX(characterSpeed);
+		camera.moveLeft(characterSpeed);
 		break;
 	case 'd':
-		camera.moveX(-characterSpeed);
+		camera.moveRight(characterSpeed);
 		break;
 	}
 
@@ -98,7 +90,7 @@ void mouse(int x, int y) {
 	glutPostRedisplay();
 }
 
-int main(int argc, char** argv) {
+void main(int argc, char** argv) {
 	glutInit(&argc, argv);
 	glutInitWindowPosition(0, 0);
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -113,9 +105,30 @@ int main(int argc, char** argv) {
 	glEnable(GL_NORMALIZE); 	// ENABLE NORMALIZE OF VECTORS AFTER ANY OPERATION 
 	glEnable(GL_COLOR_MATERIAL); // ENABLE COLOR MATERIAL
 	glShadeModel(GL_SMOOTH); // ENABLE SHADING
-
+	glDepthMask(GL_TRUE);
 	// REGISTER CALLBACKS
 	glutKeyboardFunc(Keyboard);
 	glutPassiveMotionFunc(mouse);
 	glutMainLoop();
+}
+
+void drawDot(float x ,float y, float z) {
+	glPointSize(20);
+	glBegin(GL_POINTS);
+	glColor3f(1, 0, 0);
+	glVertex3f(x, y, z);
+	glEnd();
+}
+
+void drawHUD() {
+	glPushMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	/* HUD ELEMENTs DRAWING*/
+	/*  CROSSHAIR */
+	drawDot(WINDOW_WIDTH/2, WINDOW_HEIGHT/2, 0);
+	glPopMatrix();
 }
