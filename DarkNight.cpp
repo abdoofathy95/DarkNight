@@ -1,5 +1,13 @@
-#include <Camera.h>
-#include <glut.h>
+#include "Camera.h"
+#ifdef __APPLE__
+#  include <OpenGL/gl.h>
+#  include <OpenGL/glu.h>
+#  include <GLUT/glut.h>
+#else
+#  include <GL/gl.h>
+#  include <GL/glu.h>
+#  include <GL/glut.h>
+#endif
 
 // FUNCTIONS DEFENITIONS
 void drawAxis();
@@ -17,7 +25,7 @@ const float WINDOW_WIDTH = 1366, WINDOW_HEIGHT = 768; //
 const float FPS = 60.0;
 float oldMouseX = WINDOW_WIDTH/2, oldMouseY = WINDOW_HEIGHT/2;
 
-Camera camera = Camera(0.5, 0, 0.5, 0, 0, 0);
+Camera camera = Camera(0.5, 0, 0.5, 1, 1, 1);
 
 void drawWall(double thickness) {
 	glPushMatrix();
@@ -90,7 +98,7 @@ void mouse(int x, int y) {
 	glutPostRedisplay();
 }
 
-void main(int argc, char** argv) {
+int main(int argc, char** argv) {
 	glutInit(&argc, argv);
 	glutInitWindowPosition(0, 0);
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
