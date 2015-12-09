@@ -7,6 +7,7 @@ void keyboard(unsigned char key, int x, int y);
 void mouse(int x, int y);
 void fpsTimer(int value); // FPS (CONTROL THE RATE POST DISPLAY IS CALLED ( CURRENTLY 60)
 void drawHUD();
+void createFlashLight(int x,int y,int z);
 						  
 ////////////////////////GAMEPLAY CONSTANTS////////////////////////////////////
 float mouseSensitivity = 1.1;
