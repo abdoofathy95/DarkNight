@@ -17,22 +17,20 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
+//#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h> /* @rlyeh: floorf() */
 
-#ifdef __APPLE__
-#include <GL/glut.h>  /* @rlyeh: before including GL. doesnt hurt and makes life better */
-#else
-#include <glut.h>
-#endif
-
-#ifdef __MACOSX__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
+//#ifdef __APPLE__
+//#include <OpenGL/gl.h>
+//#include <OpenGL/glu.h>
+//#include <GLUT/glut.h>
+//#else
+//#include <glut.h>
+//#include <array>
+//#endif
 
 /* @rlyeh: removed STB_TRUETYPE_IMPLENTATION. We link it externally */
 #include "stb_truetype.h"
@@ -401,7 +399,7 @@ int sth_add_glyph_for_char(struct sth_stash* stash,
                                   int x, int y, int w, int h,
                                   float xoffset, float yoffset, float xadvance)
 {
-    unsigned int codepoint;
+    unsigned int codepoint = 0;
 	unsigned int state = 0;
     
     for (; *s; ++s)

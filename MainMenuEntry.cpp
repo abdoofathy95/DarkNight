@@ -1,7 +1,7 @@
 #include "MainMenuEntry.h"
 
 
-int x, y;
+extern int x, y;
 bool hover;
 MainMenuEntry::MainMenuEntry() {}
 MainMenuEntry::MainMenuEntry(int _x,int _y,bool _hover)
