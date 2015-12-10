@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="DarkNight.cpp" />
+    <ClCompile Include="Vector3f.cpp" />
+    <ClCompile Include="fontstash.c" />
+    <ClCompile Include="stb_truetype.c" />
+    <ClCompile Include="MainMenuEntry.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Vector3f.h" />
+    <ClInclude Include="fontstash.h" />
+    <ClInclude Include="stb_truetype.h" />
+    <ClInclude Include="MainMenuEntry.h" />
+  </ItemGroup>
+</Project>

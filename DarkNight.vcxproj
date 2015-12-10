@@ -13,10 +13,16 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DarkNight.cpp" />
+    <ClCompile Include="fontstash.c" />
+    <ClCompile Include="MainMenuEntry.cpp" />
+    <ClCompile Include="stb_truetype.c" />
     <ClCompile Include="Vector3f.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="fontstash.h" />
+    <ClInclude Include="MainMenuEntry.h" />
+    <ClInclude Include="stb_truetype.h" />
     <ClInclude Include="Vector3f.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
