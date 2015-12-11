@@ -15,6 +15,7 @@
     <ClCompile Include="DarkNight.cpp" />
     <ClCompile Include="fontstash.c" />
     <ClCompile Include="MainMenuEntry.cpp" />
+    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="stb_truetype.c" />
     <ClCompile Include="Vector3f.cpp" />
   </ItemGroup>
@@ -22,6 +23,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="fontstash.h" />
     <ClInclude Include="MainMenuEntry.h" />
+    <ClInclude Include="Shader.h" />
     <ClInclude Include="stb_truetype.h" />
     <ClInclude Include="Vector3f.h" />
   </ItemGroup>
@@ -72,7 +74,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glut32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glut32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutputPath)\..</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

@@ -19,15 +19,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#include <GLUT/glut.h>
-#else
-#include <glut.h>
-#include <array>
-#endif
 
 #ifndef FONTSTASH_H
 #define FONTSTASH_H
