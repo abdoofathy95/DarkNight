@@ -40,14 +40,14 @@ void initMenuEntries();
 
 ////////////////////////GAMEPLAY CONSTANTS////////////////////////////////////
 float mouseSensitivity = 1.1;
-float characterSpeed = 0.01;
+float characterSpeed = 0.1;
 ///////////////////// DISPLAY CONSTANTS/////////////////////////////
 const float WINDOW_WIDTH = 1366, WINDOW_HEIGHT = 768; //
 const float FPS = 60.0;
 float oldMouseX = WINDOW_WIDTH / 2, oldMouseY = WINDOW_HEIGHT / 2;
 const int FONT_SIZE = 100, DEFAULT_ENTRY_SIZE = 50;
 char *FILE_PATH = "./FreeFonts/bloody.ttf";
-Camera camera = Camera(0.5, 0.04, 0.5, 0.4, 0.05, 0.4);
+Camera camera = Camera(5, 0.25, 5, 0, 0.25, 0, 0, 1, 0);
 bool gameStarted, gameLost, gameWon;
 int shaderId,programId; // SHADER
 const float LIGHT_SPOT_INNER_CONE = 0.5f;
@@ -68,6 +68,20 @@ void drawWall(double thickness) {
 	glPushMatrix();
 	glTranslated(0.5 * thickness, 0, 0.5 * thickness);
 	glScaled(thickness, 0.001, thickness);
+	glutSolidCube(1);
+	glPopMatrix();
+}
+
+void drawWall2(float startX, float startZ, bool horizontal, float length, float thickness) {
+	glPushMatrix();
+	if(horizontal) {
+		glTranslatef(startX + length / 2, 0.5, startZ + thickness / 2);
+		glRotatef(-90, 0, 1, 0);
+	}
+	else {
+		glTranslatef(startX + thickness / 2, 0.5, startZ + length / 2);
+	}
+	glScalef(thickness, 1, length); 
 	glutSolidCube(1);
 	glPopMatrix();
 }
@@ -110,6 +124,28 @@ void setupCamera() {
 	camera.look();
 }
 
+static void drawCoordinates() {
+        glPushMatrix();
+        glBegin(GL_LINES);
+        glColor3f(1.0f, 0.0f, 0.0f);
+        glVertex3f(0.0f, 0.0f, 0.0f);
+        glVertex3f(100.0f, 0.0f, 0.0f);
+        glEnd();
+        
+        glBegin(GL_LINES);
+        glColor3f(0.0f, 1.0f, 0.0f);
+        glVertex3f(0.0f, 0.0f, 0.0f);
+        glVertex3f(0.0f, 100.0f, 0.0f);
+        glEnd();
+        
+        glBegin(GL_LINES);
+        glColor3f(0.0f, 0.0f, 1.0f);
+        glVertex3f(0.0f, 0.0f, 0.0f);
+        glVertex3f(0.0f, 0.0f, 100.0f);
+        glEnd();
+        glPopMatrix();
+    }
+
 void Display() {
 
 	if (gameLost) {
@@ -129,11 +165,16 @@ void Display() {
 		glutSetCursor(GLUT_CURSOR_NONE);
 		setupCamera();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glColor3f(0.752941, 0.752941, 0.752941);
+		/*glColor3f(0.752941, 0.752941, 0.752941);
 		drawWall(100);
 		glPushMatrix();
 		glRotated(90, 0, 0, 1.0);
-		drawWall(2);
+		drawWall(2);*/
+		drawCoordinates();
+		drawWall2(0, 0, false, 10, 0.05);
+		drawWall2(0, 0, true, 10, 0.05);
+		drawWall2(10, 0, false, 10, 0.05);
+		drawWall2(0, 10, true, 10, 0.05);
 		glPopMatrix();
 	}
 	glFlush();
@@ -228,7 +269,7 @@ int main(int argc, char** argv) {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutFullScreen();
 
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 	glutWarpPointer(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2); // Position mouse at middle of screen
 	glEnable(GL_DEPTH_TEST); // ENABLE PERSPECTIVE CAMERA
 	glEnable(GL_LIGHTING);	// ENABLE LIGHT 

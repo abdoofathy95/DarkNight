@@ -1,13 +1,13 @@
-#ifdef __APPLE__
-#  include <OpenGL/gl.h>
-#  include <OpenGL/glu.h>
-#  include <GLUT/glut.h>
-#else
-#  include <glut.h>
-#endif
+using namespace std;
+#include <vector>
+#include <glut.h>
 #include "Camera.h"
 #include <math.h>
 #define DEG2RAD(a) (a * 0.0174532925)
+
+	static vector<float> collisionX;
+	static vector<float> collisionZ;
+	
 
 Vector3f eye, center, up, direction;
 
@@ -31,20 +31,20 @@ Camera::Camera(float eyeX, float eyeY, float eyeZ, float centerX, float centerY,
 
 void Camera::moveForward(float d) {
 	Vector3f view = (center - eye).unit();
-	//    eye = eye + view * d;
-	eye = add(eye, mul(view, d));
-	//    center = center + view * d;
-	center = add(center, mul(view, d));
-	direction = view;
+	    eye = eye + view * d;
+	//eye = add(eye, mul(view, d));
+	    center = center + view * d;
+	//center = add(center, mul(view, d));
+	//direction = view;
 }
 
 void Camera::moveBackward(float d) {
-	Vector3f view = (center - eye).unit();
-	//    eye = eye - view * d;
-	eye = sub(eye, mul(view, d));
-	//    center = center - view * d;
-	center = sub(center, mul(view, d));
-	direction = view;
+	Vector3f view = (eye - center).unit();
+	    eye = eye + view * d;
+	//eye = add(eye, mul(view, d));
+	    center = center + view * d;
+	//center = add(center, mul(view, d));
+	//direction = view;
 }
 
 void Camera::moveLeft(float d) {
