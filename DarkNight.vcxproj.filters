@@ -8,6 +8,9 @@
     <ClCompile Include="Vector3f.cpp" />
     <ClCompile Include="stb_truetype.c" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="SoundManager.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -16,5 +19,13 @@
     <ClInclude Include="MainMenuEntry.h" />
     <ClInclude Include="stb_truetype.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="SoundManager.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Sound">
+      <UniqueIdentifier>{87fb85b7-08a0-4973-9cd1-250f58d3e504}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
