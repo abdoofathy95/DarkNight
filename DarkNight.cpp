@@ -47,7 +47,7 @@ void initMenuEntries();
 
 ////////////////////////GAMEPLAY CONSTANTS////////////////////////////////////
 float mouseSensitivity = 1.1;
-float characterSpeed = 0.07;
+float characterSpeed = 0.1;
 float adrenalineLevel = 0.0f;
 float adrenalineIncValue = 1; // how much the adrenaline level rise each second
 float adrenalineIncTime = 5000; //5 seconds
