@@ -1,35 +1,25 @@
-﻿Build started 12/12/2015 1:24:39 AM.
+﻿Build started 12/12/2015 2:58:47 AM.
      1>Project "C:\Users\Karim\Documents\DarkNight\DarkNight.vcxproj" on node 2 (build target(s)).
        Project file contains ToolsVersion="14.0". This toolset may be unknown or missing, in which case you may be able to resolve this by installing the appropriate version of MSBuild, or the build may have been forced to a particular ToolsVersion for policy reasons. Treating the project as if it had ToolsVersion="4.0". For more information, please see http://go.microsoft.com/fwlink/?LinkId=291333.
      1>InitializeBuildStatus:
-         Creating "Debug\DarkNight.unsuccessfulbuild" because "AlwaysCreate" was specified.
+         Touching "Debug\DarkNight.unsuccessfulbuild".
        ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /IC:\Users\Karim\Documents\DarkNight\Debug\\.. /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt DarkNight.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /IC:\Users\Karim\Documents\DarkNight\Debug\\.. /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt Camera.cpp DarkNight.cpp
          DarkNight.cpp
-         All outputs are up-to-date.
-       Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Karim\Documents\DarkNight\Debug\DarkNight.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:C:\Users\Karim\Documents\DarkNight\Debug\\.. glut32.lib glew32s.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\DarkNight.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\Karim\Documents\DarkNight\Debug\DarkNight.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Karim\Documents\DarkNight\Debug\DarkNight.lib" /MACHINE:X86 Debug\Camera.obj
-         Debug\DarkNight.obj
-         Debug\fontstash.obj
-         Debug\MainMenuEntry.obj
-         Debug\Shader.obj
-         Debug\stb_truetype.obj
-         Debug\Vector3f.obj
-     1>Camera.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/INCREMENTAL:NO' specification
-     1>LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
-     1>Shader.obj : warning LNK4049: locally defined symbol ___glewAttachShader imported
-     1>Shader.obj : warning LNK4049: locally defined symbol ___glewCompileShader imported
-     1>Shader.obj : warning LNK4049: locally defined symbol ___glewShaderSource imported
-     1>Shader.obj : warning LNK4049: locally defined symbol ___glewCreateShader imported
-     1>glew32s.lib(glew.obj) : warning LNK4099: PDB 'vc120.pdb' was not found with 'glew32s.lib(glew.obj)' or at 'C:\Users\Karim\Documents\DarkNight\Debug\vc120.pdb'; linking object as if no debug info
-         DarkNight.vcxproj -> C:\Users\Karim\Documents\DarkNight\Debug\DarkNight.exe
-       Manifest:
-         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"C:\Users\Karim\Documents\DarkNight\Debug\DarkNight.exe;#1" /manifest Debug\DarkNight.exe.intermediate.manifest
-       FinalizeBuildStatus:
-         Deleting file "Debug\DarkNight.unsuccessfulbuild".
-         Touching "Debug\DarkNight.lastbuildstate".
-     1>Done Building Project "C:\Users\Karim\Documents\DarkNight\DarkNight.vcxproj" (build target(s)).
+     1>c:\users\karim\documents\darknight\camera.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+     1>c:\users\karim\documents\darknight\darknight.cpp(324): error C2440: '=' : cannot convert from 'int' to 'float [1000]'
+                 There are no conversions to array types, although there are conversions to references or pointers to arrays
+     1>c:\users\karim\documents\darknight\darknight.cpp(325): error C2440: '=' : cannot convert from 'int' to 'float [1000]'
+                 There are no conversions to array types, although there are conversions to references or pointers to arrays
+     1>c:\users\karim\documents\darknight\darknight.cpp(326): error C2440: '=' : cannot convert from 'int' to 'float [1000]'
+                 There are no conversions to array types, although there are conversions to references or pointers to arrays
+     1>c:\users\karim\documents\darknight\darknight.cpp(327): error C2039: 'forward' : is not a member of 'Camera'
+                 c:\users\karim\documents\darknight\camera.h(10) : see declaration of 'Camera'
+         Camera.cpp
+     1>c:\users\karim\documents\darknight\camera.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+         Generating Code...
+     1>Done Building Project "C:\Users\Karim\Documents\DarkNight\DarkNight.vcxproj" (build target(s)) -- FAILED.
 
-Build succeeded.
+Build FAILED.
 
-Time Elapsed 00:00:00.70
+Time Elapsed 00:00:00.53

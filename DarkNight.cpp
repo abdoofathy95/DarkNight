@@ -40,14 +40,14 @@ void initMenuEntries();
 
 ////////////////////////GAMEPLAY CONSTANTS////////////////////////////////////
 float mouseSensitivity = 1.1;
-float characterSpeed = 0.1;
+float characterSpeed = 0.75;
 ///////////////////// DISPLAY CONSTANTS/////////////////////////////
 const float WINDOW_WIDTH = 1366, WINDOW_HEIGHT = 768; //
 const float FPS = 60.0;
 float oldMouseX = WINDOW_WIDTH / 2, oldMouseY = WINDOW_HEIGHT / 2;
 const int FONT_SIZE = 100, DEFAULT_ENTRY_SIZE = 50;
 char *FILE_PATH = "./FreeFonts/bloody.ttf";
-Camera camera = Camera(5, 0.25, 5, 0, 0.25, 0, 0, 1, 0);
+Camera camera = Camera(2.5, 0.25, 2.5, 2.5, 0.25, 7.5, 0, 1, 0);
 bool gameStarted, gameLost, gameWon;
 int shaderId,programId; // SHADER
 const float LIGHT_SPOT_INNER_CONE = 0.5f;
@@ -171,10 +171,38 @@ void Display() {
 		glRotated(90, 0, 0, 1.0);
 		drawWall(2);*/
 		drawCoordinates();
-		drawWall2(0, 0, false, 10, 0.05);
-		drawWall2(0, 0, true, 10, 0.05);
-		drawWall2(10, 0, false, 10, 0.05);
-		drawWall2(0, 10, true, 10, 0.05);
+		drawWall2(0, 0, true, 5, 0.05);
+		drawWall2(0, 0, false, 15, 0.05);
+		drawWall2(5, 0, false, 15, 0.05);
+		drawWall2(-15, 15, true, 15, 0.05);
+		drawWall2(5, 15, true, 15, 0.05);
+		drawWall2(-15, 0, false, 15, 0.05);
+		drawWall2(-30, 0, true, 15, 0.05);
+		
+
+		drawWall2(-15, 20, true, 30, 0.05);
+		drawWall2(-15, 35, true, 30, 0.05);
+		drawWall2(-15, 20, false, 15, 0.05);
+		drawWall2(15, 20, false, 15, 0.05);	
+
+		drawWall2(-25, 5, true, 5, 0.05);
+		drawWall2(-25, 20, true, 5, 0.05);
+		drawWall2(-25, 5, false, 15, 0.05);
+		drawWall2(-20, 5, false, 15, 0.05);
+
+		drawWall2(-25, 25, true, 5, 0.05);
+		drawWall2(-25, 55, true, 5, 0.05);
+		drawWall2(-25, 25, false, 30, 0.05);
+		drawWall2(-20, 25, false, 30, 0.05);
+
+		drawWall2(-15, 55, true, 30, 0.05);
+		drawWall2(-15, 40, true, 30, 0.05);
+		drawWall2(-15, 40, false, 15, 0.05);
+		drawWall2(15, 40, false, 15, 0.05);
+
+		drawWall2(-30, 60, true, 50, 0.05);
+		drawWall2(20, 15, false, 45, 0.05);
+		drawWall2(-30, 0, false, 60, 0.05);
 		glPopMatrix();
 	}
 	glFlush();
@@ -292,6 +320,11 @@ int main(int argc, char** argv) {
 	initMenuEntries();
 	glewInit();
 	shaderId = configureShader();
+
+	camera.left = 0;
+	camera.right = 10;
+	camera.backward = 0;
+	camera.forward = 10;
 	glutMainLoop();
 }
 

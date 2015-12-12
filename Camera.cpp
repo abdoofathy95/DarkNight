@@ -5,11 +5,19 @@ using namespace std;
 #include <math.h>
 #define DEG2RAD(a) (a * 0.0174532925)
 
-	static vector<float> collisionX;
-	static vector<float> collisionZ;
 	
 
-Vector3f eye, center, up, direction;
+Vector3f eye, center, up, direction, newCenter, newEye;
+
+	int s;
+	int rightSector[1000];
+	int leftSector[1000];
+	int forwardSector[1000];
+	int backwardSector[1000];
+	float right[1000];
+	float left[1000];
+	float forward2[1000];
+	float backward[1000];
 
 Vector3f add(Vector3f u, Vector3f v) {
 	return Vector3f(u.x + v.x, u.y + v.y, u.z + v.z);
@@ -27,40 +35,59 @@ Camera::Camera(float eyeX, float eyeY, float eyeZ, float centerX, float centerY,
 	eye = Vector3f(eyeX, eyeY, eyeZ);
 	center = Vector3f(centerX, centerY, centerZ);
 	up = Vector3f(upX, upY, upZ);
+	s = 1;
+}
+
+void updateSector() {
+	if(leftSector[s] && newEye.x < left[s]) s = leftSector[s];
+	if(rightSector[s] && newEye.x > right[s]) s = rightSector[s];
+	if(backwardSector[s] && newEye.z < backward[s]) s = backwardSector[s];
+	if(forwardSector[s] && newEye.z > forward2[s]) s = forwardSector[s];
+}
+
+bool Camera::blocked() {
+	return false;
+	if(!leftSector[s] && newEye.x <= left[s] + 0.05) return true;
+	if(!rightSector[s] && newEye.x >= right[s] - 0.05) return true;
+	if(!backwardSector[s] && newEye.z <= backward[s] + 0.05) return true;
+	if(!forwardSector[s] && newEye.z >= forward2[s] - 0.05) return true;
+	return false;
 }
 
 void Camera::moveForward(float d) {
 	Vector3f view = (center - eye).unit();
-	    eye = eye + view * d;
-	//eye = add(eye, mul(view, d));
-	    center = center + view * d;
-	//center = add(center, mul(view, d));
-	//direction = view;
+	newEye = eye + view * d;
+	newCenter = center + view * d;
+	if(blocked()) return;
+	eye = newEye;
+	center = newCenter;
 }
 
 void Camera::moveBackward(float d) {
-	Vector3f view = (eye - center).unit();
-	    eye = eye + view * d;
-	//eye = add(eye, mul(view, d));
-	    center = center + view * d;
-	//center = add(center, mul(view, d));
-	//direction = view;
+	Vector3f view = (center - eye).unit();
+	newEye = eye - view * d;
+	newCenter = center - view * d;
+	if(blocked()) return;
+	eye = newEye;
+	center = newCenter;
 }
 
 void Camera::moveLeft(float d) {
 	Vector3f left = up.cross(center - eye).unit();
-	//    eye = eye + left * d;
-	eye = add(eye, mul(left, d));
-	//    center = center + left * d;
-	center = add(center, mul(left, d));
+	newEye = eye + left * d;
+	newCenter = center + left * d;
+	if(blocked()) return;
+	eye = newEye;
+	center = newCenter;
 }
 
 void Camera::moveRight(float d) {
 	Vector3f right = up.cross(center - eye).unit();
-	//    eye = eye - right * d;
-	eye = sub(eye, mul(right, d));
-	//    center = center - right * d;
-	center = sub(center, mul(right, d));
+	newEye = eye - right * d;
+	newCenter = center - right * d;
+	if(blocked()) return;
+	eye = newEye;
+	center = newCenter;
 }
 
 void Camera::rotateX(float a) {
