@@ -1,4 +1,5 @@
 using namespace std;
+#include <iostream>
 #include <vector>
 #include <glut.h>
 #include "Camera.h"
@@ -9,15 +10,15 @@ using namespace std;
 
 Vector3f eye, center, up, direction, newCenter, newEye;
 
-	int s;
+	int s = 1;
 	int rightSector[1000];
 	int leftSector[1000];
 	int forwardSector[1000];
 	int backwardSector[1000];
-	float right[1000];
-	float left[1000];
+	float right2[1000];
+	float left2[1000];
 	float forward2[1000];
-	float backward[1000];
+	float backward2[1000];
 
 Vector3f add(Vector3f u, Vector3f v) {
 	return Vector3f(u.x + v.x, u.y + v.y, u.z + v.z);
@@ -38,18 +39,17 @@ Camera::Camera(float eyeX, float eyeY, float eyeZ, float centerX, float centerY,
 	s = 1;
 }
 
-void updateSector() {
-	if(leftSector[s] && newEye.x < left[s]) s = leftSector[s];
-	if(rightSector[s] && newEye.x > right[s]) s = rightSector[s];
-	if(backwardSector[s] && newEye.z < backward[s]) s = backwardSector[s];
-	if(forwardSector[s] && newEye.z > forward2[s]) s = forwardSector[s];
+void Camera::updateSector() {
+	if(leftSector[s] && eye.x > left2[s]) s = leftSector[s];
+	if(rightSector[s] && eye.x < right2[s]) s = rightSector[s];
+	if(backwardSector[s] && eye.z < backward2[s]) s = backwardSector[s];
+	if(forwardSector[s] && eye.z > forward2[s]) s = forwardSector[s];
 }
 
 bool Camera::blocked() {
-	return false;
-	if(!leftSector[s] && newEye.x <= left[s] + 0.05) return true;
-	if(!rightSector[s] && newEye.x >= right[s] - 0.05) return true;
-	if(!backwardSector[s] && newEye.z <= backward[s] + 0.05) return true;
+	if(!leftSector[s] && newEye.x >= left2[s] - 0.05) return true;
+	if(!rightSector[s] && newEye.x <= right2[s] + 0.05) return true;
+	if(!backwardSector[s] && newEye.z <= backward2[s] + 0.05) return true;
 	if(!forwardSector[s] && newEye.z >= forward2[s] - 0.05) return true;
 	return false;
 }
@@ -61,6 +61,7 @@ void Camera::moveForward(float d) {
 	if(blocked()) return;
 	eye = newEye;
 	center = newCenter;
+	updateSector();
 }
 
 void Camera::moveBackward(float d) {
@@ -70,6 +71,7 @@ void Camera::moveBackward(float d) {
 	if(blocked()) return;
 	eye = newEye;
 	center = newCenter;
+	updateSector();
 }
 
 void Camera::moveLeft(float d) {
@@ -79,6 +81,7 @@ void Camera::moveLeft(float d) {
 	if(blocked()) return;
 	eye = newEye;
 	center = newCenter;
+	updateSector();
 }
 
 void Camera::moveRight(float d) {
@@ -88,6 +91,7 @@ void Camera::moveRight(float d) {
 	if(blocked()) return;
 	eye = newEye;
 	center = newCenter;
+	updateSector();
 }
 
 void Camera::rotateX(float a) {
