@@ -30,6 +30,6 @@ public:
 	void rotateX(float a);
 	void rotateY(float a);
 	void look();
-	
+
 };
 

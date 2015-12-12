@@ -28,7 +28,7 @@ public:
 	void playClickSound();
 	void playStartSound();
 	void playScaredSound();
-	void playBreathSound();
+	void stopBreathFastSound();
 	void playBreathFastSound();
 	void stopMainMenuMusic();
 	void stopThemeMusic();

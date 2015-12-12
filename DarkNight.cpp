@@ -28,22 +28,30 @@ extern "C" {
 	void sth_delete(struct sth_stash* stash);
 }
 // FUNCTIONS DEFENITIONS
+
+void updateCamera();
 int configureShader();
 void renderFlashlight();
 void renderString(char *text, float x, float y, float r, float g, float b, int fontSize);
-void drawDot(float x, float y, float z);
 void keyboard(unsigned char key, int x, int y);
 void mouse(int x, int y);
 void fpsTimer(int value); // FPS (CONTROL THE RATE POST DISPLAY IS CALLED ( CURRENTLY 60)
 void drawHUD();
+void drawAdrenalineBar();
+void fillAdrenalineBar(float value);
+void handleAdrenaline(int value);
 void drawMainMenu();
-void drawMenuEntry(char *text,int x, int y, float r, float g, float b,int count);
+void drawMenuEntry(char *text, int x, int y, float r, float g, float b, int count);
 void mouseMenu(int button, int state, int x, int y);
 void initMenuEntries();
 
 ////////////////////////GAMEPLAY CONSTANTS////////////////////////////////////
 float mouseSensitivity = 1.1;
 float characterSpeed = 0.07;
+float adrenalineLevel = 0.0f;
+float adrenalineIncValue = 1; // how much the adrenaline level rise each second
+float adrenalineIncTime = 5000; //5 seconds
+const int MAX_ADRENALINE = 200;
 ///////////////////// DISPLAY CONSTANTS/////////////////////////////
 const float WINDOW_WIDTH = 1366, WINDOW_HEIGHT = 768; //
 const float FPS = 60.0;
@@ -52,7 +60,7 @@ const int FONT_SIZE = 100, DEFAULT_ENTRY_SIZE = 50;
 char *FILE_PATH = "./FreeFonts/bloody.ttf";
 Camera camera;
 bool gameStarted, gameLost, gameWon;
-int shaderId,programId; // SHADER
+int shaderId, programId; // SHADER
 const float LIGHT_SPOT_INNER_CONE = 0.5f;
 const float LIGHT_SPOT_OUTER_CONE = 15.0f;
 // Calculate the cos cutoff angles for use in the spot light shader.
@@ -65,28 +73,20 @@ MainMenuEntry settings;
 MainMenuEntry help;
 MainMenuEntry quit;
 MainMenuEntry menuEntries[4]; // array holding all 4 buttons
-//////////////// SOUND MANAGER ///////////////////
+							  //////////////// SOUND MANAGER ///////////////////
 SoundManager sManager;
 bool mainMusicStop = true, gameThemeStop = true, hoverSound = false;
 
-void drawWall(double thickness) {
+void drawWall(float startX, float startZ, bool horizontal, float length, float thickness) {
 	glPushMatrix();
-	glTranslated(0.5 * thickness, 0, 0.5 * thickness);
-	glScaled(thickness, 0.001, thickness);
-	glutSolidCube(1);
-	glPopMatrix();
-}
-
-void drawWall2(float startX, float startZ, bool horizontal, float length, float thickness) {
-	glPushMatrix();
-	if(horizontal) {
+	if (horizontal) {
 		glTranslatef(startX + length / 2, 0.5, startZ + thickness / 2);
 		glRotatef(-90, 0, 1, 0);
 	}
 	else {
 		glTranslatef(startX + thickness / 2, 0.5, startZ + length / 2);
 	}
-	glScalef(thickness, 1, length); 
+	glScalef(thickness, 1, length);
 	glutSolidCube(1);
 	glPopMatrix();
 }
@@ -94,17 +94,17 @@ void drawWall2(float startX, float startZ, bool horizontal, float length, float 
 int configureShader() {
 	Shader shader;
 	programId = glCreateProgram();
-	shader.loadAndCompileVertexShader("./Shaders/flashlight.vs",programId);
+	shader.loadAndCompileVertexShader("./Shaders/flashlight.vs", programId);
 	shader.loadAndCompileFragShader("./Shaders/flashlight.frag", programId);
 	glLinkProgram(programId);
 	return programId;
 }
 
 void setupLights() {
-	GLfloat ambient[4] = { 0.19225f, 0.19225f, 0.19225f, 1.0f };
-	GLfloat diffuse[4] = { 0.50754f, 0.50754f, 0.50754f, 1.0f };
+	GLfloat ambient[4] = { 0.59225f, 0.59225f, 0.59225f, 1.0f };
+	GLfloat diffuse[4] = { 0.50754f, 0.50754f, 0.50754f, 0.0f };
 	GLfloat specular[4] = { 0.508273f, 0.508273f, 0.508273f, 1.0f };
-	GLfloat emission[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	GLfloat emission[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	GLfloat shininess = 51.2f;
 
 	glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
@@ -119,37 +119,39 @@ void setupLights() {
 
 }
 void setupCamera() {
-	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(45.0, WINDOW_WIDTH / WINDOW_HEIGHT, 0.001, 50);
-
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	camera.look();
 }
 
+void updateCamera() {
+	camera.look();
+}
+
 static void drawCoordinates() {
-        glPushMatrix();
-        glBegin(GL_LINES);
-        glColor3f(1.0f, 0.0f, 0.0f);
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(100.0f, 0.0f, 0.0f);
-        glEnd();
-        
-        glBegin(GL_LINES);
-        glColor3f(0.0f, 1.0f, 0.0f);
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(0.0f, 100.0f, 0.0f);
-        glEnd();
-        
-        glBegin(GL_LINES);
-        glColor3f(0.0f, 0.0f, 1.0f);
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(0.0f, 0.0f, 100.0f);
-        glEnd();
-        glPopMatrix();
-    }
+	glPushMatrix();
+	glBegin(GL_LINES);
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(100.0f, 0.0f, 0.0f);
+	glEnd();
+
+	glBegin(GL_LINES);
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, 100.0f, 0.0f);
+	glEnd();
+
+	glBegin(GL_LINES);
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, 0.0f, 100.0f);
+	glEnd();
+	glPopMatrix();
+}
 
 void Display() {
 
@@ -157,15 +159,18 @@ void Display() {
 		// show game over and restart button
 	}
 
-	if (gameWon) {
+	else if (gameWon) {
 		// show you are out or whatever
 	}
 
-	if (!gameStarted) {
+	else if (!gameStarted) {
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		drawMainMenu();
 		if (mainMusicStop) { // called only once At the main menu
 			mainMusicStop = false;
 			sManager.playMainMenuMusic();
+			sManager.stopBreathFastSound();
+			glutTimerFunc(adrenalineIncTime, handleAdrenaline, adrenalineIncValue);
 		}
 	}
 	else {
@@ -175,49 +180,52 @@ void Display() {
 			sManager.playBreathFastSound();
 			mainMusicStop = true;
 		}
+		if (adrenalineLevel >= MAX_ADRENALINE) gameLost = true;
 		glUseProgram(shaderId);
 		renderFlashlight();
+		drawAdrenalineBar();
 		glutSetCursor(GLUT_CURSOR_NONE);
-		setupCamera();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		drawHUD();
+		updateCamera();
 		/*glColor3f(0.752941, 0.752941, 0.752941);
 		drawWall(100);
 		glPushMatrix();
 		glRotated(90, 0, 0, 1.0);
 		drawWall(2);*/
 		//drawCoordinates();
-		drawWall2(0, 0, true, 5, 0.05);
-		drawWall2(0, 0, false, 15, 0.05);
-		drawWall2(5, 0, false, 15, 0.05);
-		drawWall2(-15, 15, true, 15, 0.05);
-		drawWall2(5, 15, true, 15, 0.05);
-		drawWall2(-15, 0, false, 15, 0.05);
-		drawWall2(-30, 0, true, 15, 0.05);
-		
+		drawWall(0, 0, true, 5, 0.05);
+		drawWall(0, 0, false, 15, 0.05);
+		drawWall(5, 0, false, 15, 0.05);
+		drawWall(-15, 15, true, 15, 0.05);
+		drawWall(5, 15, true, 15, 0.05);
+		drawWall(-15, 0, false, 15, 0.05);
+		drawWall(-30, 0, true, 15, 0.05);
 
-		drawWall2(-15, 20, true, 30, 0.05);
-		drawWall2(-15, 35, true, 30, 0.05);
-		drawWall2(-15, 20, false, 15, 0.05);
-		drawWall2(15, 20, false, 15, 0.05);	
 
-		drawWall2(-25, 5, true, 5, 0.05);
-		drawWall2(-25, 20, true, 5, 0.05);
-		drawWall2(-25, 5, false, 15, 0.05);
-		drawWall2(-20, 5, false, 15, 0.05);
+		drawWall(-15, 20, true, 30, 0.05);
+		drawWall(-15, 35, true, 30, 0.05);
+		drawWall(-15, 20, false, 15, 0.05);
+		drawWall(15, 20, false, 15, 0.05);
 
-		drawWall2(-25, 25, true, 5, 0.05);
-		drawWall2(-25, 55, true, 5, 0.05);
-		drawWall2(-25, 25, false, 30, 0.05);
-		drawWall2(-20, 25, false, 30, 0.05);
+		drawWall(-25, 5, true, 5, 0.05);
+		drawWall(-25, 20, true, 5, 0.05);
+		drawWall(-25, 5, false, 15, 0.05);
+		drawWall(-20, 5, false, 15, 0.05);
 
-		drawWall2(-15, 55, true, 30, 0.05);
-		drawWall2(-15, 40, true, 30, 0.05);
-		drawWall2(-15, 40, false, 15, 0.05);
-		drawWall2(15, 40, false, 15, 0.05);
+		drawWall(-25, 25, true, 5, 0.05);
+		drawWall(-25, 55, true, 5, 0.05);
+		drawWall(-25, 25, false, 30, 0.05);
+		drawWall(-20, 25, false, 30, 0.05);
 
-		drawWall2(-30, 60, true, 50, 0.05);
-		drawWall2(20, 15, false, 45, 0.05);
-		drawWall2(-30, 0, false, 60, 0.05);
+		drawWall(-15, 55, true, 30, 0.05);
+		drawWall(-15, 40, true, 30, 0.05);
+		drawWall(-15, 40, false, 15, 0.05);
+		drawWall(15, 40, false, 15, 0.05);
+
+		drawWall(-30, 60, true, 50, 0.05);
+		drawWall(20, 15, false, 45, 0.05);
+		drawWall(-30, 0, false, 60, 0.05);
 		glPopMatrix();
 	}
 	glFlush();
@@ -261,7 +269,7 @@ void mouse(int x, int y) { // handle the main menu hover and ingame motion
 				hoverSound = true;
 			}
 		}
-		else if(x >= menuEntries[1].x &&
+		else if (x >= menuEntries[1].x &&
 			x < menuEntries[1].x + 180 &&
 			y >= menuEntries[1].y + 110 &&
 			y < menuEntries[1].y + 150) { // second entry
@@ -290,7 +298,7 @@ void mouse(int x, int y) { // handle the main menu hover and ingame motion
 		else if (x >= menuEntries[3].x &&
 			x < menuEntries[3].x + 80 &&
 			y >= menuEntries[3].y + 385 &&
-			y < menuEntries[3].y +430) {// forth entry
+			y < menuEntries[3].y + 430) {// forth entry
 			menuEntries[0].hover = false;
 			menuEntries[1].hover = false;
 			menuEntries[2].hover = false;
@@ -571,9 +579,9 @@ int main(int argc, char** argv) {
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	glutCreateWindow("Dark Night (Egyptian edition)");
 	glutDisplayFunc(Display);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutFullScreen();
-
+	setupCamera();
 	//glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 	glutWarpPointer(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2); // Position mouse at middle of screen
 	glEnable(GL_DEPTH_TEST); // ENABLE PERSPECTIVE CAMERA
@@ -593,6 +601,7 @@ int main(int argc, char** argv) {
 	glutKeyboardFunc(Keyboard);
 	glutMouseFunc(mouseMenu);
 	glutPassiveMotionFunc(mouse);
+	glutTimerFunc(1, fpsTimer, 0);
 	// INITIALIZERS
 	initMenuEntries();
 	glewInit();
@@ -605,43 +614,34 @@ int main(int argc, char** argv) {
 	glutMainLoop();
 }
 
-void drawDot(float x, float y, float z) {
-	glPointSize(20);
-	glBegin(GL_POINTS);
-	glColor3f(1, 0, 0);
-	glVertex3f(x, y, z);
-	glEnd();
-}
-
 void drawMainMenu() {
-
+	glDepthMask(GL_FALSE);  // disable writes to Z-Buffer
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_LIGHTING);
+	glEnable(GL_TEXTURE_2D);
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
 	gluOrtho2D(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
-
 	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
 	glLoadIdentity();
-	glDisable(GL_LIGHTING);
-	glDepthMask(GL_FALSE);  // disable writes to Z-Buffer
-	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_TEXTURE_2D);
 	/* HUD ELEMENTs DRAWING*/
 	renderString("AYAM SODA", WINDOW_WIDTH / 3.8, WINDOW_HEIGHT / 1.3, 0.75, 0, 0, 150);
-	drawMenuEntry("Play", WINDOW_WIDTH / 2.2, WINDOW_HEIGHT / 2, 0.5, 0, 0,1);
-	drawMenuEntry("Settings", WINDOW_WIDTH / 2.35, WINDOW_HEIGHT / 2.5, 0.5, 0, 0,2);
-	drawMenuEntry("Help", WINDOW_WIDTH / 2.2, WINDOW_HEIGHT / 3.2, 0.5, 0, 0,3);
-	drawMenuEntry("Exit", WINDOW_WIDTH / 2.2, WINDOW_HEIGHT / 4.5, 0.5, 0, 0,4);
-	
+	drawMenuEntry("Play", WINDOW_WIDTH / 2.2, WINDOW_HEIGHT / 2, 0.5, 0, 0, 1);
+	drawMenuEntry("Settings", WINDOW_WIDTH / 2.35, WINDOW_HEIGHT / 2.5, 0.5, 0, 0, 2);
+	drawMenuEntry("Help", WINDOW_WIDTH / 2.2, WINDOW_HEIGHT / 3.2, 0.5, 0, 0, 3);
+	drawMenuEntry("Exit", WINDOW_WIDTH / 2.2, WINDOW_HEIGHT / 4.5, 0.5, 0, 0, 4);
 	/*END OF ELEMENTS */
-	glDisable(GL_TEXTURE_2D);
-	glEnable(GL_LIGHTING);
 	// Making sure we can render 3d again
 	glDepthMask(GL_TRUE);  // disable writes to Z-Buffer
 	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
 	glutSwapBuffers();
 }
 
@@ -662,16 +662,16 @@ void renderString(char *text, float x, float y, float r, float g, float b, int f
 	sth_delete(stash);
 }
 
-void drawMenuEntry(char *text,int x,int y,float r,float g,float b,int count) {
-	menuEntries[count-1].x = x;
-	menuEntries[count-1].y = y;
-	if(menuEntries[count-1].hover == true)
+void drawMenuEntry(char *text, int x, int y, float r, float g, float b, int count) {
+	menuEntries[count - 1].x = x;
+	menuEntries[count - 1].y = y;
+	if (menuEntries[count - 1].hover == true)
 		renderString(text, x, y, 1, g, b, DEFAULT_ENTRY_SIZE);
 	else
-		renderString(text,x, y,r,g,b,DEFAULT_ENTRY_SIZE);
+		renderString(text, x, y, r, g, b, DEFAULT_ENTRY_SIZE);
 }
 
-void mouseMenu(int button,int state,int x, int y) { // handle the main menu clicks
+void mouseMenu(int button, int state, int x, int y) { // handle the main menu clicks
 	if (!gameStarted) {
 		if (x >= menuEntries[0].x &&
 			x <= menuEntries[0].x + 100 &&
@@ -683,13 +683,13 @@ void mouseMenu(int button,int state,int x, int y) { // handle the main menu clic
 			x < menuEntries[1].x + 180 &&
 			y >= menuEntries[1].y + 110 &&
 			y < menuEntries[1].y + 150) { // second entry
-			// show Settings
+										  // show Settings
 		}
 		else if (x >= menuEntries[2].x &&
 			x <= menuEntries[2].x + 100 &&
 			y >= menuEntries[2].y + 250 &&
 			y <= menuEntries[2].y + 290) { // thirds entry
-			// show help
+										   // show help
 		}
 		else if (x >= menuEntries[3].x &&
 			x < menuEntries[3].x + 80 &&
@@ -718,4 +718,65 @@ void renderFlashlight() {
 	glUniform1i(glGetUniformLocation(programId, "colorMap"), 0);
 	glUniform1f(glGetUniformLocation(programId, "cosInnerCone"), g_cosInnerCone);
 	glUniform1f(glGetUniformLocation(programId, "cosOuterCone"), g_cosOuterCone);
+}
+
+void drawHUD() {
+	glUseProgram(0); // disable shaders (kont hat4al mn el 7war da)
+	glDisable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	gluOrtho2D(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	/* HUD ELEMENTs DRAWING*/
+	drawAdrenalineBar();
+	fillAdrenalineBar(adrenalineLevel); // filled at 150
+	/*END OF ELEMENTS */
+	// Making sure we can render 3d again
+	glUseProgram(shaderId);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_TEXTURE_2D);
+
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+
+	glutSwapBuffers();
+}
+
+void drawAdrenalineBar() {
+	float x = 5, y = 6;
+	glColor3f(0.75f, 0.75f, 0.75f);
+	glBegin(GL_LINE_LOOP);
+	glVertex2f(WINDOW_WIDTH / x - WINDOW_WIDTH / (2 * x), WINDOW_HEIGHT / y);
+	glVertex2f(WINDOW_WIDTH / x - WINDOW_WIDTH / (2 * x) + MAX_ADRENALINE, WINDOW_HEIGHT / y);
+	glVertex2f(WINDOW_WIDTH / x - WINDOW_WIDTH / (2 * x) + MAX_ADRENALINE, WINDOW_HEIGHT / y - 20);
+	glVertex2f(WINDOW_WIDTH / x - WINDOW_WIDTH / (2 * x), WINDOW_HEIGHT / y - 20);
+	glEnd();
+}
+
+
+void fillAdrenalineBar(float value) {
+	float x = 5, y = 6;
+	glColor3f(0.9f, 0.9f, 0.9f);
+	glBegin(GL_QUADS);
+	glVertex2f(WINDOW_WIDTH / x - WINDOW_WIDTH / (2 * x), WINDOW_HEIGHT / y);
+	glVertex2f(WINDOW_WIDTH / x - WINDOW_WIDTH / (2 * x) + value, WINDOW_HEIGHT / y);
+	glVertex2f(WINDOW_WIDTH / x - WINDOW_WIDTH / (2 * x) + value, WINDOW_HEIGHT / y - 20);
+	glVertex2f(WINDOW_WIDTH / x - WINDOW_WIDTH / (2 * x), WINDOW_HEIGHT / y - 20);
+	glEnd();
+}
+
+void handleAdrenaline(int value) {
+		adrenalineLevel += adrenalineIncValue;
+		glutTimerFunc(adrenalineIncTime, handleAdrenaline, 0);
+}
+
+void fpsTimer(int value) {
+	glutPostRedisplay();
+	glutTimerFunc(1000 / FPS, fpsTimer, 0);
 }

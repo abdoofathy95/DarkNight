@@ -41,8 +41,11 @@ void SoundManager::playScaredSound() {
 	playSound(suspenseSource, 1.0, 1.0, AL_FALSE);
 }
 void SoundManager::playBreathFastSound() {
-	alSourceStop(breathSourceFast);
 	playSound(breathSourceFast, 1.0, 1.0, AL_TRUE);
+}
+
+void SoundManager::stopBreathFastSound() {
+	alSourceStop(breathSourceFast);
 }
 
 void SoundManager::stopThemeMusic() {
